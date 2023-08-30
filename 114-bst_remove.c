@@ -1,99 +1,65 @@
 #include "binary_trees.h"
 
-bst_t *inorderSuccessor(bst_t *root);
-bst_t *bstDelete(bst_t *root, bst_t *node);
-bst_t *bstRemoveRecursive(bst_t *root, bst_t *node, int value);
-bst_t *bst_remove(bst_t *root, int value);
-
 /**
- * inorderSuccessor - It's Returns the minimum value of a binary search tree.
- * @root: It's A pointer to the root node of the BST to search.
- *
- * Return: It's The minimum value in @tree.
- */
-bst_t *inorderSuccessor(bst_t *root)
+* menorElemento - It's todo.
+* @nd: It's todo.
+* Return: It's todo.
+*/
+bst_t *menorElemento(bst_t *nd)
 {
-	while (root->left != NULL)
-		root = root->left;
-	return (root);
+	while (nd->left)
+		nd = nodo->left;
+	return (nd);
+
 }
 
 /**
- * bstDelete - It's Deletes a node from a binary search tree.
- * @root: It's A pointer to the root node of the BST.
- * @node: It's A pointer to the node to delete from the BST.
+ * bst_remove - It's Remove a node from a binary search tree
+ * @root: It's Pointer to the root of the tree
+ * @value: It's The value to remove
  *
- * Return: It's A pointer to the new root node after deletion.
- */
-bst_t *bstDelete(bst_t *root, bst_t *node)
-{
-	bst_t *prt = node->prt, *sscr = NULL;
-
-	/* No children or right-child only */
-	if (node->left == NULL)
-	{
-		if (prt != NULL && prt->left == node)
-			prt->left = node->right;
-		else if (prt != NULL)
-			prt->right = node->right;
-		if (node->right != NULL)
-			node->right->prt = prt;
-		free(node);
-		return (prt == NULL ? node->right : root);
-	}
-
-	/* Left-child only */
-	if (node->right == NULL)
-	{
-		if (prt != NULL && prt->left == node)
-			prt->left = node->left;
-		else if (prt != NULL)
-			prt->right = node->left;
-		if (node->left != NULL)
-			node->left->prt = prt;
-		free(node);
-		return (prt == NULL ? node->left : root);
-	}
-
-	/* Two children */
-	sscr = inorderSuccessor(node->right);
-	node->n = sscr->n;
-
-	return (bstDelete(root, sscr));
-}
-
-/**
- * bstRemoveRecursive - It's Removes node from a binary tree recursively.
- * @root: It's A pointer to root node of the BST to remove a node from.
- * @node: It's A pointer to current node in the BST.
- * @value: It's The value to remove from the BST.
- *
- * Return: It's A pointer to the root node after deletion.
- */
-bst_t *bstRemoveRecursive(bst_t *root, bst_t *node, int value)
-{
-	if (node != NULL)
-	{
-		if (node->n == value)
-			return (bstDelete(root, node));
-		if (node->n > value)
-			return (bstRemoveRecursive(root, node->left, value));
-		return (bstRemoveRecursive(root, node->right, value));
-	}
-	return (NULL);
-}
-
-/**
- * bst_remove - It's Removes a node from a binary search tree.
- * @root: It's A pointer to root node of the BST to remove a node from.
- * @value: It's The value to remove in the BST.
- *
- * Return: It's A pointer to the new root node after deletion.
- *
- * Description: So, If the node to be deleted has two children, it
- *              is replaced with its first in-order sscr.
+ * Return: It's A pointer to the new root node
  */
 bst_t *bst_remove(bst_t *root, int value)
 {
-	return (bstRemoveRecursive(root, root, value));
+	bst_t *hld = NULL;
+
+	if (!root)
+		return (NULL);
+
+	if (root->n > value)
+		root->left = bst_remove(root->left, value);
+	else
+		if (root->n < value)
+			root->right = bst_remove(root->right, value);
+		else
+		{
+			if (root->left && root->right)
+			{
+				hld = menorElemento(root->right);
+				root->n = hld->n;
+				root->right = bst_remove(root->right, hld->n);
+			}
+			else
+			{
+				if (!root->left && !root->right)
+				{
+					free(root);
+					return (NULL);
+				}
+				hld = root;
+				if (!root->left)
+					root = root->right;
+				else
+					if (!root->right)
+						root = root->left;
+				if (hld->parent->left == hld)
+					hld->parent->left = root;
+				else
+					hld->parent->right = root;
+				root->parent = hld->parent;
+				free(hld);
+			}
+		}
+	return (root);
 }
